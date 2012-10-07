@@ -1,0 +1,30 @@
+{
+    "name": "datatable",
+    "version": "0.0.1",
+    "description": "Server-side processing for JQuery Datatable plug-in",
+    "author": {
+        "name": "Jim Pravetz",
+        "email": "jpravetz@jpravetz.com"
+    },
+    "maintainers": [
+        {
+            "name": "Jim Pravetz",
+            "email": "jpravetz@armor5.com"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jpravetz/node-datatable.git"
+    },
+    "keywords": [
+        "jquery",
+        "datatable",
+        "sever-side processor"
+    ],
+    "dependencies": {
+        "underscore": ">= 1.4.2"
+    },
+    "engines": {
+        "node": ">= 0.6.x"
+    }
+}
