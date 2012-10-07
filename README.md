@@ -90,7 +90,7 @@ will be added to the SQL query. This should be set to the name of the datetime c
 
 - ```dateTo``` - If set then the query will filter for records less then or equal to this date.
 
-- ```fnRowFormatter``` - A row formatter function (more documentation to follow).
+- ```fnRowFormatter``` - A row formatter function (more documentation below).
 
 #### Returns #####
 
@@ -141,7 +141,7 @@ Parses an array of response objects that were received in response to each of th
 
 #### Parameters ####
 
-- __queryResult__: The ordered array of query response objects.
+- ```queryResult```: The ordered array of query response objects.
 
 #### Returns #####
 
@@ -154,6 +154,34 @@ var result = queryBuilder.parseResponse( queryResponseArray );
 res.json(result);
 ```
 
+## Complex database queries involving JOIN ##
+
+Example using ```sSelectSql``` and ```sFromSql``` to create a JOIN query.
+
+```javascript
+{
+  sSelectSql: "table3.username,table1.timestamp,urlType,mimeType,table1.table3Id,url,table2.code,table2.description",
+  sFromSql: "table1 LEFT JOIN table2 ON table1.errorId=table2.errorId LEFT JOIN table3 ON table1.sessionId=table3.sessionId",
+}
+```
+
+The response of a more complex database queries can result in more columns of data then is displayed in the
+the browser table. The example below shows how six columns in a row of database response data are reduced to four columns.
+The ```row.urlType``` and ```row.mimeType``` are reduced into one column, as are the ```row.url```, ```row.code```
+and ```row.description```.
+
+```javascript
+fnRowFormatter: function( row, column ) {
+    var result = [ row.username, dateutil.dateToSortableString(row.timestamp) ];
+    result.push( urlTypeMap(row.urlType,row.mimeType) );
+    var url = row.url ? decodeURI(row.url).replace( /https?:\/\//i, '') : "";
+    if( row.code )
+        url += "</br>" + row.code + ": " + row.description;
+    result.push( url );
+    return result;
+}
+```
+
 ## TODO ##
 
 1. Add an additional parameter to allow more then the requested number of records to be returned. This can be used to reduce the
@@ -163,4 +191,5 @@ number of client-server calls (I think).
 ## References ##
 
 [1](http://datatables.net/usage/server-side)
+
 [2](http://datatables.net/forums/discussion/4214/solved-how-to-handle-large-datasets/p1)
