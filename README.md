@@ -3,13 +3,13 @@ node-datatable
 
 Node.js implementation of a server-side processor for the JQuery Datatable plug-in.
 
-This is version 0.0.1 of this module. You should be careful of relying on this implementation until it has been more
+This is version 0.0.2 of this module. You should be careful of relying on this implementation until it has been more
 thoroughly reviewed.
 
 The node-datatable module provides backend SQL query generation and result parsing to support
 [datatable](http://datatables.net/usage/server-side) server-side processing for SQL databases.
 This module does not connect nor query a database, instead leaving this task to the calling application.
-This has been done so that the caller can leverage his or her existing module choices for connection pools,
+SQL querying has been separated so that the caller can leverage his or her existing module choices for connection pools,
 database interfaces, and the like. This module has been used with
 both [node-mysql](https://github.com/felixge/node-mysql) and [sequelize](http://sequelizejs.com).
 
@@ -34,7 +34,7 @@ var requestQuery = {
     iDisplayLength: 5
 };
 
-// Build an array of queries
+// Build an array of SQL query statements
 var queries = queryBuilder.buildQuery( requestQuery );
 
 // Connect with and query the database.
@@ -55,22 +55,30 @@ The source code contains additional comments that will help you understand this 
 
 ### Constructor ###
 
+Construct a QueryBuilder object.
+
 #### Parameters ####
 
-The node-datatable constructor takes an object parameter that has the following options:
+The node-datatable constructor takes an object parameter that has the following options. In the simplest case only the first
+two options will be necessary.
 
 - ```sTableName``` - The name of the table in the database where a JOIN is not used. If JOIN is used then set ```sSelectSql```.
 
-- ```sCountColumnName``` For simple queries this is the name of the column for which to do a COUNT(). Defaults to ```id```.
-For more complex queries, when sSelectSql is set, ```*``` will be used.
-
-- ```sDatabase``` - If set then will add a SQL "USE sDatabase" statement as the first SQL query string.
-
 - ```aoColumnDefs``` - An array of objects each containing ```mData``` and ```bSearchable``` properties.
+The default value for ```bSearchable``` is false.
 
-- ```bSearchable``` default is false.
+- ```sCountColumnName``` For simple queries this is the name of the column on which to do a SQL COUNT(). Defaults to ```id```.
+For more complex queries, meaning when sSelectSql is set, ```*``` will be used.
 
-- ```aSearchColumns``` -
+- ```sDatabase``` - If set then will add a SQL _USE sDatabase_ statement as the first SQL query string to be
+returned by ```buildQuery```.
+
+- ```aSearchColumns``` - In database queries where JOIN is used, you may wish to specify an alternate array of column names
+that the search string will be applied against. Example:
+
+```javascript
+aSearchColumns: [ "table3.username", "table1.timestamp", "table1.urlType", "table1.mimeType", "table1.url", "table2.description" ],
+```
 
 - ```sSelectSql``` - If set then this defines the columns that should be selected, otherwise ```*``` is used. This can be
 used in combination with joins (see ```sFromSql```).
@@ -91,10 +99,10 @@ Example to sort on a particular column:
 sSortSql: "ORDER BY activity.timestamp DESC"
 ```
 
-- ```sWhereAndSql``` - Any arbitrary custom SQL to be joined to other WHERE clauses using AND.
+- ```sWhereAndSql``` - Use this to specify an arbitrary custom SQL that you wish to AND with the generated WHERE clauses.
 
-- ```sDateColumnName``` - If this property and one of ```dateFrom``` or ```dateTo``` is set, a date range WHERE construct
-will be added to the SQL query. This should be set to the name of the datetime column.
+- ```sDateColumnName``` - If this property and one of ```dateFrom``` or ```dateTo``` is set, a date range WHERE clause
+will be added to the SQL query. This should be set to the name of the datetime column that is to be used in the clause.
 
 - ```dateFrom``` - If set then the query will filter for records greater then or equal to this date.
 
@@ -121,8 +129,8 @@ var queryBuilder = new QueryBuilder( {
 
 Builds an array containing between two and four SQL statements, in the following order:
 
-1. _(Optional, if sDatabase is set)_ A USE statement that specifies which database to use.
-2. _(Optional, if requestQuery.sSearch is set)_ A SELECT statement that counts the number of filtered entries.
+1. _(Optional, if ```sDatabase``` is set)_ A USE statement that specifies which database to use.
+2. _(Optional, if ```requestQuery.sSearch``` is set)_ A SELECT statement that counts the number of filtered entries.
 This is used to calculate the ```iTotalDisplayRecords``` return value.
 3. A SELECT statement that counts the total number of unfiltered entries in the database. This is used to calculate
 the ```iTotalRecords``` return value.
@@ -137,7 +145,8 @@ Note that #2, #3 and #4 will include date filtering as well as any other filteri
 
 #### Returns #####
 
-The resultant array of query strings. The queries should be executed in order, and the result objects collected into an array which you later pass to the ```parseReponse``` function. 
+The resultant array of query strings. The queries should be executed in order, and the result objects collected
+into an equivalently ordered array that is later passed to the ```parseReponse``` function.
 
 Example:
 
@@ -164,7 +173,7 @@ var result = queryBuilder.parseResponse( queryResponseArray );
 res.json(result);
 ```
 
-## Complex database queries involving JOIN ##
+## Database queries involving JOIN ##
 
 Example using ```sSelectSql``` and ```sFromSql``` to create a JOIN query.
 
@@ -177,7 +186,7 @@ Example using ```sSelectSql``` and ```sFromSql``` to create a JOIN query.
 
 The response of a more complex database queries can result in more columns of data then is displayed in the
 the browser table. The example below shows how six columns in a row of database response data are reduced to four columns.
-The ```row.urlType``` and ```row.mimeType``` are reduced into one column, as are the ```row.url```, ```row.code```
+In this example, the ```row.urlType``` and ```row.mimeType``` are reduced into one column, as are the ```row.url```, ```row.code```
 and ```row.description```.
 
 ```javascript
