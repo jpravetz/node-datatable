@@ -3,8 +3,6 @@ node-datatable
 
 Server-side processor for the JQuery Datatable plug-in.
 
-This initial checkin is not ready for public use.
-
 The node-datatable module provides backend SQL query generation and result parsing to support
 [datatable](http://datatables.net/usage/server-side) server-side processing for SQL databases.
 This module does not connect nor query a database, instead leaving this task to the calling application.
