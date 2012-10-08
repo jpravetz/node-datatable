@@ -3,7 +3,7 @@ node-datatable
 
 Node.js implementation of a server-side processor for the JQuery Datatable plug-in.
 
-This is version 0.0.2 of this module. You should be careful of relying on this implementation until it has been more
+This is version 0.0.3 of this module. You should be careful of relying on this implementation until it has been more
 thoroughly reviewed.
 
 The node-datatable module provides backend SQL query generation and result parsing to support
@@ -88,15 +88,6 @@ is used. Use this for more complex queries, for example when using JOIN. Example
 
 ```javascript
 "table1 LEFT JOIN table2 ON table1.errorId=table2.errorId LEFT JOIN table3 ON table1.sessionId=table3.sessionId"
-```
-
-- ```sSortSql``` - If set, and if no other sorting is specified in the [Parameters sent to the server](http://datatables.net/usage/server-side),
-then this sort SQL will be used. Before using this option you should
-[investigate calling fnSort() after initialization](http://www.datatables.net/forums/discussion/3285/dynamic-default-sort-columns/p1).
-Example to sort on a particular column:
-
-```javascript
-sSortSql: "ORDER BY activity.timestamp DESC"
 ```
 
 - ```sWhereAndSql``` - Use this to specify an arbitrary custom SQL that you wish to AND with the generated WHERE clauses.
