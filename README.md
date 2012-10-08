@@ -3,8 +3,10 @@ node-datatable
 
 Node.js implementation of a server-side processor for the JQuery Datatable plug-in.
 
-This is version 0.0.3 of this module. You should be careful of relying on this implementation until it has been more
-thoroughly reviewed.
+You should be careful about relying on this implementation until it has been more thoroughly reviewed,
+and be aware that the API may change as a result of such review.
+I will bump the version to 0.1.0 when I have reason to believe the API is stable.
+That said, please help review this implementation!
 
 The node-datatable module provides backend SQL query generation and result parsing to support
 [datatable](http://datatables.net/usage/server-side) server-side processing for SQL databases.
