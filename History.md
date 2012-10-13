@@ -1,3 +1,8 @@
+0.0.5 / 2012-10-12
+==================
+
+  * Added oRowFormatterParams to fnRowFormatter function
+
 0.0.4 / 2012-10-08
 ==================
 

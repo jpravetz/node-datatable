@@ -3,10 +3,7 @@ node-datatable
 
 Node.js implementation of a server-side processor for the JQuery Datatable plug-in.
 
-You should be careful about relying on this implementation until it has been more thoroughly reviewed,
-and be aware that the API may change as a result of such review.
-I will bump the version to 0.1.0 when I have reason to believe the API is stable.
-That said, please help review this implementation!
+You should be careful of relying on this implementation until it has been more thoroughly reviewed, and be aware that the API may change as a result of such review.  I will bump the version to 0.1.0 when I have reason to believe the API is stable.  That said, please help review this implementation!
 
 The node-datatable module provides backend SQL query generation and result parsing to support
 [datatable](http://datatables.net/usage/server-side) server-side processing for SQL databases.
@@ -101,7 +98,11 @@ will be added to the SQL query. This should be set to the name of the datetime c
 
 - ```dateTo``` - If set then the query will filter for records less then or equal to this date.
 
-- ```fnRowFormatter``` - A row formatter function (more documentation below).
+- ```fnRowFormatter``` - A row formatter function callback that takes the parameters ( row, aoColumnDefs, params ).
+Row is an object containing a row of returned data, columns is aoColumnDefs (see above), and params is the object
+set for oRowFormatterParams. There is more documentation below on this function.
+
+- ```oRowFormatterParams``` - Optional params passed to fnRowFormatter.
 
 #### Returns #####
 
@@ -183,8 +184,9 @@ In this example, the ```row.urlType``` and ```row.mimeType``` are reduced into o
 and ```row.description```.
 
 ```javascript
-fnRowFormatter: function( row, column ) {
-    var result = [ row.username, dateutil.dateToSortableString(row.timestamp) ];
+fnRowFormatter: function( row, column, params ) {
+    var tzoffset = params ? params.tzOffset : undefined;
+    var result = [ row.username, dateutil.toSortableString(row.timestamp,tzoffset) ];
     result.push( urlTypeMap(row.urlType,row.mimeType) );
     var url = row.url ? decodeURI(row.url).replace( /https?:\/\//i, '') : "";
     if( row.code )
@@ -193,6 +195,9 @@ fnRowFormatter: function( row, column ) {
     return result;
 }
 ```
+
+In the above example, params is used to pass the timezone offset. This illustrates a use where the timezone offset
+originates in the browser and is used when outputting the date.
 
 ## TODO ##
 

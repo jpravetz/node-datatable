@@ -1,30 +1,33 @@
 {
-    "name": "datatable",
-    "version": "0.0.4",
-    "description": "Server-side processing for JQuery Datatable plug-in",
-    "author": {
-        "name": "Jim Pravetz",
-        "email": "jpravetz@jpravetz.com"
-    },
-    "maintainers": [
-        {
-            "name": "Jim Pravetz",
-            "email": "jpravetz@armor5.com"
-        }
-    ],
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/jpravetz/node-datatable.git"
-    },
-    "keywords": [
-        "jquery",
-        "datatable",
-        "sever-side processor"
-    ],
-    "dependencies": {
-        "underscore": ">= 1.4.2"
-    },
-    "engines": {
-        "node": ">= 0.6.x"
+  "name": "datatable",
+  "version": "0.0.5",
+  "description": "Server-side processing for JQuery Datatable plug-in",
+  "author": {
+    "name": "Jim Pravetz",
+    "email": "jpravetz@jpravetz.com"
+  },
+  "maintainers": [
+    {
+      "name": "Jim Pravetz",
+      "email": "jpravetz@armor5.com"
     }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jpravetz/node-datatable.git"
+  },
+  "keywords": [
+    "jquery",
+    "datatable",
+    "sever-side processor"
+  ],
+  "dependencies": {
+    "underscore": ">= 1.4.2"
+  },
+  "engines": {
+    "node": ">= 0.6.x"
+  },
+  "readme": "node-datatable\n==============\n\nNode.js implementation of a server-side processor for the JQuery Datatable plug-in.\n\nYou should be careful about relying on this implementation until it has been more thoroughly reviewed,\nand be aware that the API may change as a result of such review.\nI will bump the version to 0.1.0 when I have reason to believe the API is stable.\nThat said, please help review this implementation!\n\nThe node-datatable module provides backend SQL query generation and result parsing to support\n[datatable](http://datatables.net/usage/server-side) server-side processing for SQL databases.\nThis module does not connect nor query a database, instead leaving this task to the calling application.\nSQL querying has been separated so that the caller can leverage his or her existing module choices for connection pools,\ndatabase interfaces, and the like. This module has been used with\nboth [node-mysql](https://github.com/felixge/node-mysql) and [sequelize](http://sequelizejs.com).\n\nAn incomplete code example:\n\n```javascript\nvar QueryBuilder = require('datatable');\n\nvar tableDefinition = {\n    sTableName: \"Orgs\",\n    aoColumnDefs: [\n        { mData: \"o\", bSearchable: true },\n        { mData: \"cn\", bSearchable: true },\n        { mData: \"support\" }\n    ]};\n\nvar queryBuilder = new QueryBuilder( tableDefinition );\n\n// requestQuery is normally provided by the datatable ajax call\nvar requestQuery = {\n    iDisplayStart: 0,\n    iDisplayLength: 5\n};\n\n// Build an array of SQL query statements\nvar queries = queryBuilder.buildQuery( requestQuery );\n\n// Connect with and query the database.\n// If you have turned on multipleStatements (e.g. node-mysql) then you may join the queries into one string.\n// multipleStatements is normally turned off by default to prevent SQL injections.\n\nvar myDbObject = ...\nmyDbObject.query( queries, function( err, resultArray ) {\n    var result = queryBuilder.parseResponse(resultArray);\n    res.json(result)\n});\n\n```\n\n## API ##\n\nThe source code contains additional comments that will help you understand this module.\n\n### Constructor ###\n\nConstruct a QueryBuilder object.\n\n#### Parameters ####\n\nThe node-datatable constructor takes an object parameter that has the following options. In the simplest case only the first\ntwo options will be necessary.\n\n- ```sTableName``` - The name of the table in the database where a JOIN is not used. If JOIN is used then set ```sSelectSql```.\n\n- ```aoColumnDefs``` - An array of objects each containing ```mData``` and ```bSearchable``` properties.\nThe default value for ```bSearchable``` is false.\n\n- ```sCountColumnName``` For simple queries this is the name of the column on which to do a SQL COUNT(). Defaults to ```id```.\nFor more complex queries, meaning when sSelectSql is set, ```*``` will be used.\n\n- ```sDatabase``` - If set then will add a SQL _USE sDatabase_ statement as the first SQL query string to be\nreturned by ```buildQuery```.\n\n- ```aSearchColumns``` - In database queries where JOIN is used, you may wish to specify an alternate array of column names\nthat the search string will be applied against. Example:\n\n```javascript\naSearchColumns: [ \"table3.username\", \"table1.timestamp\", \"table1.urlType\", \"table1.mimeType\", \"table1.url\", \"table2.description\" ],\n```\n\n- ```sSelectSql``` - If set then this defines the columns that should be selected, otherwise ```*``` is used. This can be\nused in combination with joins (see ```sFromSql```).\n\n- ```sFromSql``` - If set then this is used as the FROM section for the SELECT statement. If not set then ```sTableName```\nis used. Use this for more complex queries, for example when using JOIN. Example when using a double JOIN:\n\n```javascript\n\"table1 LEFT JOIN table2 ON table1.errorId=table2.errorId LEFT JOIN table3 ON table1.sessionId=table3.sessionId\"\n```\n\n- ```sWhereAndSql``` - Use this to specify an arbitrary custom SQL that you wish to AND with the generated WHERE clauses.\n\n- ```sDateColumnName``` - If this property and one of ```dateFrom``` or ```dateTo``` is set, a date range WHERE clause\nwill be added to the SQL query. This should be set to the name of the datetime column that is to be used in the clause.\n\n- ```dateFrom``` - If set then the query will filter for records greater then or equal to this date.\n\n- ```dateTo``` - If set then the query will filter for records less then or equal to this date.\n\n- ```fnRowFormatter``` - A row formatter function (more documentation below).\n\n#### Returns #####\n\nThe query builder object.\n\nExample:\n\n```javascript\nvar queryBuilder = new QueryBuilder( {\n    sTableName: 'user',\n    aoColumnDefs: [\n        { mData: 'username', bSearchable: true },\n        { mData: 'email', bSearchable: true }\n    ]});\n```\n\n### buildQuery ###\n\nBuilds an array containing between two and four SQL statements, in the following order:\n\n1. _(Optional, if ```sDatabase``` is set)_ A USE statement that specifies which database to use.\n2. _(Optional, if ```requestQuery.sSearch``` is set)_ A SELECT statement that counts the number of filtered entries.\nThis is used to calculate the ```iTotalDisplayRecords``` return value.\n3. A SELECT statement that counts the total number of unfiltered entries in the database. This is used to calculate\nthe ```iTotalRecords``` return value.\n4. A SELECT statement that returns the actual filtered records from the database. This will use LIMIT to limit the number\nof entries returned.\n\nNote that #2, #3 and #4 will include date filtering as well as any other filtering specified in ```sWhereAndSql```.\n\n#### Parameters ####\n\n- ```requestQuery```: An object containing the properties set by the client-side datatable library as defined in [Parameters sent to the server](http://datatables.net/usage/server-side).\n\n#### Returns #####\n\nThe resultant array of query strings. The queries should be executed in order, and the result objects collected\ninto an equivalently ordered array that is later passed to the ```parseReponse``` function.\n\nExample:\n\n```javascript\nvar queries = queryBuilder.buildQuery( oRequestQuery );\n```\n\n### parseResponse ###\n\nParses an array of response objects that were received in response to each of the queries generated by the ```buildQuery``` function. The order of responses must correspond with the query order.\n\n#### Parameters ####\n\n- ```queryResult```: The ordered array of query response objects.\n\n#### Returns #####\n\nAn object containing the properties defined in [Reply from the server](http://datatables.net/usage/server-side).\n\nExample:\n\n```javascript\nvar result = queryBuilder.parseResponse( queryResponseArray );\nres.json(result);\n```\n\n## Database queries involving JOIN ##\n\nExample using ```sSelectSql``` and ```sFromSql``` to create a JOIN query.\n\n```javascript\n{\n  sSelectSql: \"table3.username,table1.timestamp,urlType,mimeType,table1.table3Id,url,table2.code,table2.description\",\n  sFromSql: \"table1 LEFT JOIN table2 ON table1.errorId=table2.errorId LEFT JOIN table3 ON table1.sessionId=table3.sessionId\",\n}\n```\n\nThe response of a more complex database queries can result in more columns of data then is displayed in the\nthe browser table. The example below shows how six columns in a row of database response data are reduced to four columns.\nIn this example, the ```row.urlType``` and ```row.mimeType``` are reduced into one column, as are the ```row.url```, ```row.code```\nand ```row.description```.\n\n```javascript\nfnRowFormatter: function( row, column ) {\n    var result = [ row.username, dateutil.dateToSortableString(row.timestamp) ];\n    result.push( urlTypeMap(row.urlType,row.mimeType) );\n    var url = row.url ? decodeURI(row.url).replace( /https?:\\/\\//i, '') : \"\";\n    if( row.code )\n        url += \"</br>\" + row.code + \": \" + row.description;\n    result.push( url );\n    return result;\n}\n```\n\n## TODO ##\n\n1. Add an additional parameter to allow more then the requested number of records to be returned. This can be used to reduce the\nnumber of client-server calls (I think).\n2. A more thorough SQL injection security review (volunteers?).\n\n## References ##\n\n[1](http://datatables.net/usage/server-side)\n\n[2](http://datatables.net/forums/discussion/4214/solved-how-to-handle-large-datasets/p1)",
+  "_id": "datatable@0.0.4",
+  "_from": "datatable@>= 0.0.4"
 }
