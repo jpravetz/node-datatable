@@ -1,3 +1,8 @@
+1.0.0 / 2013-01-25
+==================
+
+  * Bumped version to reflect stability. There were no changes from v0.0.6.
+
 0.0.6 / 2012-10-14
 ==================
 
