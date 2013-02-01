@@ -1,3 +1,8 @@
+1.0.1 / 2013-02-01
+==================
+
+  * Do more thorough sanitization of input parameters
+
 1.0.0 / 2013-01-25
 ==================
 
