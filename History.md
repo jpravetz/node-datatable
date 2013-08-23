@@ -1,3 +1,10 @@
+1.1.0 / 2013-08-22
+==================
+
+  * Added PostgreSQL support, courtesy Eric Chauty
+  * Added 'sAjaxDataProp' property to constructor options to allow result property name to be set (defaults to 'aaData')
+  * Fixed issue where return was incorrectly limited when iDisplayLength is set to -1
+
 1.0.2 / 2013-08-01
 ==================
 
