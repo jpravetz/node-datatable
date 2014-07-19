@@ -59,6 +59,8 @@ Construct a QueryBuilder object.
 The node-datatable constructor takes an object parameter that has the following options. In the simplest case only the first
 two options will be necessary.
 
+- ```dbType``` - The database engine you work with, e.g. ```postgres```. This will affect the construction queries which include LIMIT. The default value for ```dbType``` is ```mysql```.
+
 - ```sTableName``` - The name of the table in the database where a JOIN is not used. If JOIN is used then set ```sSelectSql```.
 
 - ```aoColumnDefs``` - An array of objects each containing ```mData``` and ```bSearchable``` properties.
