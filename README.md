@@ -1,10 +1,10 @@
 node-datatable
 ==============
 
-Node.js implementation of a server-side processor for the JQuery Datatable plug-in.
+Node.js implementation of a server-side processor for the jQuery DataTables plug-in.
 
 The node-datatable module provides backend SQL query generation and result parsing to support
-[datatable](http://datatables.net/usage/server-side) server-side processing for SQL databases.
+[DataTables](https://www.datatables.net/manual/server-side) server-side processing for SQL databases.
 This module does not connect nor query a database, instead leaving this task to the calling application.
 SQL querying has been separated so that the caller can leverage his or her existing module choices for connection pools,
 database interfaces, and the like. This module has been used with
@@ -16,16 +16,12 @@ An incomplete code example:
 var QueryBuilder = require('datatable');
 
 var tableDefinition = {
-    sTableName: "Orgs",
-    aoColumnDefs: [
-        { mData: "o", bSearchable: true },
-        { mData: "cn", bSearchable: true },
-        { mData: "support" }
-    ]};
+    sTableName: "Orgs"
+};
 
 var queryBuilder = new QueryBuilder( tableDefinition );
 
-// requestQuery is normally provided by the datatable ajax call
+// requestQuery is normally provided by the DataTables ajax call
 var requestQuery = {
     iDisplayStart: 0,
     iDisplayLength: 5
@@ -63,9 +59,6 @@ two options will be necessary.
 
 - ```sTableName``` - The name of the table in the database where a JOIN is not used. If JOIN is used then set ```sSelectSql```.
 
-- ```aoColumnDefs``` - An array of objects each containing ```mData``` and ```bSearchable``` properties.
-The default value for ```bSearchable``` is false.
-
 - ```sCountColumnName``` For simple queries this is the name of the column on which to do a SQL COUNT(). Defaults to ```id```.
 For more complex queries, meaning when sSelectSql is set, ```*``` will be used.
 
@@ -98,12 +91,6 @@ will be added to the SQL query. This should be set to the name of the datetime c
 
 - ```dateTo``` - If set then the query will filter for records less then or equal to this date.
 
-- ```fnRowFormatter``` - A row formatter function callback that takes the parameters ( row, aoColumnDefs, params ).
-Row is an object containing a row of returned data, columns is aoColumnDefs (see above), and params is the object
-set for oRowFormatterParams. There is more documentation below on this function.
-
-- ```oRowFormatterParams``` - Optional params passed to fnRowFormatter.
-
 #### Returns #####
 
 The query builder object.
@@ -111,12 +98,9 @@ The query builder object.
 Example:
 
 ```javascript
-var queryBuilder = new QueryBuilder( {
-    sTableName: 'user',
-    aoColumnDefs: [
-        { mData: 'username', bSearchable: true },
-        { mData: 'email', bSearchable: true }
-    ]});
+var queryBuilder = new QueryBuilder({
+    sTableName: 'user'
+});
 ```
 
 ### buildQuery ###
@@ -124,10 +108,10 @@ var queryBuilder = new QueryBuilder( {
 Builds an array containing between two and four SQL statements, in the following order:
 
 1. _(Optional, if ```sDatabase``` is set)_ A USE statement that specifies which database to use.
-2. _(Optional, if ```requestQuery.sSearch``` is set)_ A SELECT statement that counts the number of filtered entries.
-This is used to calculate the ```iTotalDisplayRecords``` return value.
+2. _(Optional, if ```requestQuery.search.value``` is set)_ A SELECT statement that counts the number of filtered entries.
+This is used to calculate the ```recordsFiltered``` return value.
 3. A SELECT statement that counts the total number of unfiltered entries in the database. This is used to calculate
-the ```iTotalRecords``` return value.
+the ```recordsTotal``` return value.
 4. A SELECT statement that returns the actual filtered records from the database. This will use LIMIT to limit the number
 of entries returned.
 
@@ -135,7 +119,7 @@ Note that #2, #3 and #4 will include date filtering as well as any other filteri
 
 #### Parameters ####
 
-- ```requestQuery```: An object containing the properties set by the client-side datatable library as defined in [Parameters sent to the server](http://datatables.net/usage/server-side).
+- ```requestQuery```: An object containing the properties set by the client-side DataTables library as defined in [sent parameters](https://www.datatables.net/manual/server-side#Sent-parameters).
 
 #### Returns #####
 
@@ -158,7 +142,7 @@ Parses an array of response objects that were received in response to each of th
 
 #### Returns #####
 
-An object containing the properties defined in [Reply from the server](http://datatables.net/usage/server-side).
+An object containing the properties defined in [returned data](https://www.datatables.net/manual/server-side#Returned-data).
 
 Example:
 
@@ -177,27 +161,6 @@ Example using ```sSelectSql``` and ```sFromSql``` to create a JOIN query.
   sFromSql: "table1 LEFT JOIN table2 ON table1.errorId=table2.errorId LEFT JOIN table3 ON table1.sessionId=table3.sessionId",
 }
 ```
-
-The response of a more complex database queries can result in more columns of data then is displayed in the
-the browser table. The example below shows how six columns in a row of database response data are reduced to four columns.
-In this example, the ```row.urlType``` and ```row.mimeType``` are reduced into one column, as are the ```row.url```, ```row.code```
-and ```row.description```.
-
-```javascript
-fnRowFormatter: function( row, column, params ) {
-    var tzoffset = params ? params.tzOffset : undefined;
-    var result = [ row.username, dateutil.toSortableString(row.timestamp,tzoffset) ];
-    result.push( urlTypeMap(row.urlType,row.mimeType) );
-    var url = row.url ? decodeURI(row.url).replace( /https?:\/\//i, '') : "";
-    if( row.code )
-        url += "</br>" + row.code + ": " + row.description;
-    result.push( url );
-    return result;
-}
-```
-
-In the above example, params is used to pass the timezone offset. This illustrates a use where the timezone offset
-originates in the browser and is used when outputting the date.
 
 ## TODO ##
 
