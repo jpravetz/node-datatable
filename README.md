@@ -181,14 +181,19 @@ Example using ```sSelectSql``` and ```sFromSql``` to create a JOIN query.
 }
 ```
 
+### Contributors ###
+
+* [Matthew Hasbach](https://github.com/mjhasbach)
+* [Benjamin Flesch](https://github.com/bf)
+
 ## TODO ##
 
 1. Add an additional parameter to allow more then the requested number of records to be returned. This can be used to reduce the
 number of client-server calls (I think).
 2. A more thorough SQL injection security review (volunteers?).
+3. Unit tests (the original author is no longer working on the project that uses this module, so need volunteer)
 
 ## References ##
 
-[1](http://datatables.net/usage/server-side)
-
-[2](http://datatables.net/forums/discussion/4214/solved-how-to-handle-large-datasets/p1)
+1. [Datatables Manual](http://www.datatables.net/manual/server-side)
+2. [How to Handle large datasets](http://datatables.net/forums/discussion/4214/solved-how-to-handle-large-datasets/p1)

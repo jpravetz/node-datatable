@@ -1,3 +1,12 @@
+2.0.0 / 2015-04-08
+==================
+
+  * Database 1.10.6 support:
+  ** Deprecated ```fnRowFormatter``` and ```oRowFormatterParams``` (use DataTables callbacks instead).
+  ** Deprecated ```aoColumnDefs``` (this information now comes from the DataTables AJAX request).
+  * ```buildQuery``` now returns an object with ```use```, ```data```, ```recordsTotal```, and ```recordsFiltered keys```, and ```parseResponse``` consumes it.
+  * Added Oracle support
+  
 1.1.2 / 2013-12-10
 ==================
 
@@ -6,13 +15,13 @@
 1.1.1 / 2013-09-02
 ==================
 
-  * Fixed to use 'sAjaxDataProp' in debug method
+  * Fixed to use ```sAjaxDataProp``` in debug method
 
 1.1.0 / 2013-08-22
 ==================
 
   * Added PostgreSQL support, courtesy Eric Chauty
-  * Added 'sAjaxDataProp' property to constructor options to allow result property name to be set (defaults to 'aaData')
+  * Added ```sAjaxDataProp``` property to constructor options to allow result property name to be set (defaults to 'aaData')
   * Fixed issue where return was incorrectly limited when iDisplayLength is set to -1
 
 1.0.2 / 2013-08-01
