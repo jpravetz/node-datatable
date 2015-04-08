@@ -7,8 +7,8 @@ The node-datatable module provides backend SQL query generation and result parsi
 [DataTables](https://www.datatables.net/manual/server-side) server-side processing for SQL databases.
 This module does not connect nor query a database, instead leaving this task to the calling application.
 SQL querying has been separated so that the caller can leverage his or her existing module choices for connection pools,
-database interfaces, and the like. This module has been used with
-both [node-mysql](https://github.com/felixge/node-mysql) and [sequelize](http://sequelizejs.com).
+database interfaces, and the like. This module has been used with [node-mysql](https://github.com/felixge/node-mysql),
+[sequelize](http://sequelizejs.com), and [strong-oracle](https://github.com/strongloop/strong-oracle).
 
 An incomplete code example:
 
@@ -74,7 +74,7 @@ Construct a QueryBuilder object.
 The node-datatable constructor takes an object parameter that has the following options. In the simplest case only the first
 two options will be necessary.
 
-- ```dbType``` - The database engine you work with, e.g. ```postgres```. This will affect the construction queries which include LIMIT. The default value for ```dbType``` is ```mysql```.
+- ```dbType``` - The database engine you work with (```mysql```, ```postgres```, or ```oracle```). This will affect the construction queries which include LIMIT. The default value for ```dbType``` is ```mysql```.
 
 - ```sTableName``` - The name of the table in the database where a JOIN is not used. If JOIN is used then set ```sSelectSql```.
 
