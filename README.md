@@ -81,8 +81,8 @@ two options will be necessary.
 - ```sCountColumnName``` For simple queries this is the name of the column on which to do a SQL COUNT(). Defaults to ```id```.
 For more complex queries, meaning when sSelectSql is set, ```*``` will be used.
 
-- ```sDatabase``` - If set then will add a SQL _USE sDatabase_ statement as the first SQL query string to be
-returned by ```buildQuery```.
+- ```sDatabaseOrSchema``` - If set, ```buildQuery``` will add a changeDatabaseOrSchema property to the object returned containing a
+_USE sDatabaseOrSchema_ statement for MySQL / Postgres or _ALTER SESSION SET CURRENT_SCHEMA = sDatabaseOrSchema_ statement for Oracle.
 
 - ```aSearchColumns``` - In database queries where JOIN is used, you may wish to specify an alternate array of column names
 that the search string will be applied against. Example:
