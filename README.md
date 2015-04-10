@@ -170,6 +170,25 @@ var result = queryBuilder.parseResponse( queryResponseObject );
 res.json(result);
 ```
 
+### extractResponseVal ###
+
+Extract a value from a database response. This is useful in situations where your database query returns a primitive value nested inside of an object inside of an array:
+
+#### Parameters ####
+
+- ```res```: A database response.
+
+#### Returns #####
+
+The first enumerable object property of the first element in an array, or undefined
+
+Example:
+
+```javascript
+var val = queryBuilder.extractResponseVal([{COUNT(ID): 13}]);
+console.log(val) //13
+```
+
 ## Database queries involving JOIN ##
 
 Example using ```sSelectSql``` and ```sFromSql``` to create a JOIN query.
