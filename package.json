@@ -1,6 +1,6 @@
 {
     "name": "datatable",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "Server-side processing for JQuery Datatable plug-in",
     "author": {
         "name": "Jim Pravetz",
