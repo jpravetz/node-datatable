@@ -150,6 +150,9 @@ Note that #2, #3, and #4 will include date filtering as well as any other filter
 
 - ```requestQuery```: An object containing the properties set by the client-side DataTables
 library as defined in [sent parameters](https://www.datatables.net/manual/server-side#Sent-parameters).
+Note that you may build your own ```requestQuery```, omitting certain properties, and achieve a different outcome.
+For example, passing an empty ```requestQuery``` object will build a select statement that gets all rows from the
+table. Such a scenario could be useful for building a custom file export function.
 
 #### Returns #####
 
